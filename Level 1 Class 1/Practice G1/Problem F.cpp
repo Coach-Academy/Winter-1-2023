@@ -1,13 +1,10 @@
-#include<bits/stdc++.h> 
+#include<bits/stdc++.h>
 using namespace std;
- 
- int main() {
-    
-     int x,y;
-    cin>>x>>y;
-     cout<<x+y/2<<'\n';
+
+signed main(){
+     int n;
+     cin>>n;
+     cout<<48-n<<'\n';
+    return 0;
 }
-
-
-
 

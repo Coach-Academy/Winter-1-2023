@@ -1,186 +1,180 @@
-#include <bits/stdc++.h>
-
+#include <iostream>
 using namespace std;
-
-
-
-
-
 int main()
 {
-    ///problem A
-   /*char c;
-   cin>>c;
-
-   if(c=='a' || c=='e' || c=='i' || c=='o' || c=='u')
-   {
-       cout<<"vowel";
-   }
-   else
-   {
-       cout<<"consonant";
-   }*/
-   ///problem B
-
-  /* int w;
-   cin>>w;
-
-   if(w%2==0 && w>2)
-   {
-    cout<<"YES";
-   }
-   else
-    cout<<"NO";*/
-
-   /* /// problem c
-
-    int a,b,sum,multi,mins;
-    cin>>a>>b;
-    sum=a+b;
-    multi=a*b;
-    mins=a-b;
-    if(sum>=multi && sum>=mins)
-        cout<<sum;
-    else if(mins>=multi && mins>=sum)
-        cout<<mins;
-    else
-        cout<<multi;*/
-
-
-        /// problem theater square
-        /// n & m dimensions for pivot
-        /// a dimension of brick
-
-
-       /* int n,m,a;
+    /// problem E
+     /*   int n,m,a;
         cin>>n>>m>>a;
+        long len = (n + a - 1) / a;
+        int wid = (m + a - 1) / a;
+        long long res;
+        res*=wid;
+        cout << res;*/
 
-        int sum1=n*m,sum2=a*a;
-
-        int total=(sum1+sum2-1)/sum2;
-        cout<<total;
-
-        int width=(n+a-1)/a;
-        int height= (m+a-1)/a;
-
-
-
-        int total=width*height;
-        cout<<total;
-
-
-        cout<<"kam toba";*/
-
-
-
-
-
-
-
-/// just explanation for the lecture
-    /*cout<<x<<"\n";
-
-    if(true)
-    {
-        x=7;
-        cout<<x<<"\n";
-        x++;
-
-    }
+   /// problem F
+   /*
+        int N;
+        cin>>N;
+        int a,b;
+        a=N%10;
+        b=N/100;
+        if(a==b)
+        {
+            cout<<"Yes";
+        }
+        else
+            cout<<"No";*/
 
 
 
-    cout<<x<<"\n";*/
+         ///problem G
+       /* int a,b;
+        cin>>a>>b;
+        int res=a-1;
+        if(b>=a)
+        {
+            res++;
+        }
+
+        cout<<res;*/
+
+        ///problem h
+      /*  int k,x;
+        cin>>k>>x;
+        if(500*k>=x)
+        {
+            cout<<"Yes";
+        }
+        else
+        {
+            cout<<"No";
+        }*/
 
 
+        ///problem i
+       /* int n;
+        cin>>n;
 
-  /*
-  int a=100;
-
-  if(a>60)
-  {
-      cout<<"aaa";
-  }
-
-  if(a>40)
-  {
-
-      cout<<"bbb";
-  }
-  else
-  {
-      cout<<"ccc";
-  }*/
-
-  /*int a,b,c;
-  cin>>a>>b>>c;
-
-  if(b>a)
-  {
-     if(b>c)
-        cout<<b;
-     else {
-        cout<<c;
-     }
-  }
-  else{
-        if(a>c)
-        cout<<a;
-       else {
-        cout<<c;
-     }
-  }*/
-
- /* string a="red";
-  switch(a)
-      {
-
-
-  case "red":
-      cout<"3";
+        switch(n) {
+  case 1:
+    cout<<"one";
     break;
-  case 6:
-    cout<<"6";
+  case 2:
+    cout<<"two";
     break;
-  case 7:
-      cout<<"7";
+    case 3:
+    cout<<"three";
     break;
-  default:
-      cout<<"not found";
-      }*/
-   /*   int a,b;
-      char c;
-      cin>>a>>b>>c;
-
-      switch(c){
-  case '+':
-    cout<<a+b;
+    case 4:
+    cout<<"four";
     break;
-    case '-':
-    cout<<a-b;
+    case 5:
+    cout<<"five";
     break;
-    case '*':
-    cout<<a*b;
+    case 6:
+    cout<<"six";
     break;
-
+    case 7:
+    cout<<"seven";
+    break;
+    case 8:
+    cout<<"eight";
+    break;
+    case 9:
+    cout<<"nine";
+    break;
     default:
-        cout<<a/b;
+         cout<<"Greater than 9";
+        }*/
+
+
+        /// problem j
+
+       /* int A,B,C,d;
+        cin>>A>>B>>C;
+        if(A>B)
+            cout<<"Takahashi";
+        else if(B>A)
+             cout<<"Aoki";
+        else{
+        if(C==0)
+        {
+             cout<<"Aoki";
+
+        }
+        else
+        {
+            cout<<"Takahashi";
+        }
+        }*/
 
 
 
 
-      }*/
+
+
+        ///problem k
+
+        /* n=12;
+         1 2 3 4 5 6 7 8 9 10 11
+
+         1 3 5 7 9 11 2 4 6 8 10
+
+         n=11 6
+         n=12 6
+         (n+1)/2 */
+
+
+/*
+         long long n,k;
+         cin>>n>>k;
+
+         long long mid=(n+1)/2;
+
+         if(k>mid)
+         {
+             cout<<(k-mid)*2;
+         }
+         else
+         {
+             cout<<(k*2)-1;
+         }*/
 
 
 
 
+       ///problem m
+       /*  float v,t,s,d;
+         cin>>v>>t>>s>>d;
+         float d1,d2;
+         d1=v*t;
+         d2=v*s;
+         if(d>=d1 && d<=d2)
+         {
+             cout<<"No";
+         }
+         else
+         {
+             cout<<"Yes";
+         }*/
 
 
 
-
-
-
-
+         ///problem n
+        /* string s;
+         cin>>s;
+         if(s=="RRR")
+            cout<<3;
+         else if(s=="RRS" || s=="SRR")
+            cout<<2;
+         else if(s=="RSS" || s=="RSR" || s=="SRS" || s=="SSR")
+            cout<<1;
+         else{
+            cout<<0;
+         }*/
 
     return 0;
+
+
 }
+

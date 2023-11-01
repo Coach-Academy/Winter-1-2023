@@ -1,7 +1,6 @@
 name: file_name_checking
 
 on:
-  push:
   pull_request:
 
 # This command allows us to run the Action automatically from the Actions tab.

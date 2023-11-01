@@ -12,9 +12,5 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: File Name Validator
-        uses: batista/lint-filenames@v1
-        with:
-          path: './my-folder'
-          pattern: '^.+\\..+$'
-      
+      - name: Lint Filenames
+        uses: batista/lint-filenames@v1.0.1

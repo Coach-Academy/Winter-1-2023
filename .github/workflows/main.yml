@@ -20,4 +20,5 @@ jobs:
           # The path to a directory to check the filenames.
           path: ./
           # Whether the directory should be inspected recursively or not.
+          pattern: ^.+\\..+$
           recursive: true

@@ -20,5 +20,5 @@ jobs:
           # The path to a directory to check the filenames.
           path: ./
           # Whether the directory should be inspected recursively or not.
-          pattern: ^[^\\/:\*\?"<>\|]*$
+          pattern: ^\/$|(\/[a-zA-Z_0-9-]+)+$
           recursive: true

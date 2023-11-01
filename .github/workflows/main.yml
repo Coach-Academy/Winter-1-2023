@@ -1,0 +1,9 @@
+- name: Lint Filenames
+  # You may pin to the exact commit or the version.
+  # uses: batista/lint-filenames@1b766f13475cbdd2df8f2b75d8afda9a48ce7d84
+  uses: batista/lint-filenames@v1.0.1
+  with:
+    # The path to a directory to check the filenames.
+    path: # default is ./
+    # The regex pattern to match for each of the files in the given directory
+    pattern: # default is /.+/

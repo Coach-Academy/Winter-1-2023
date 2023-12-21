@@ -32,14 +32,45 @@ template < typename T = int > ostream& operator << (ostream &out, const vector <
     return out;
 }
 
+string base3(ll x){
+    string ret = "";
+    while(x > 0){
+        ret += (x % 3) + '0';
+        x /= 3;
+    }
+    reverse(all(ret));
+    return ret;
+}
+
+ll base10(const string& x){
+    ll ret = 0, p = 1;
+    for(int i = sz(x) - 1; i >= 0; i--){
+        ret += (x[i] - '0') * p;
+        p *= 3;
+    }
+    return ret;
+}
+
 void Solve(){
-    
+    ll n;
+    cin >> n;
+    string num = base3(n);
+    int first_two = num.find("2");
+    if(first_two == -1)
+        return cout << n << "\n", void();
+    int idx = first_two;
+    while(idx < sz(num)) num[idx++] = '0';
+    idx = first_two - 1;
+    while(idx >= 0 && num[idx] != '0') num[idx--] = '0';
+    if(idx != -1) num[idx] = '1';
+    else num = "1" + num;
+    cout << base10(num) << "\n";
 }
 
 int main(){
     ios_base::sync_with_stdio(false), cin.tie(nullptr), cout.tie(nullptr);
     int test_cases = 1;
-    // cin >> test_cases;
+    cin >> test_cases;
     for(int tc = 1; tc <= test_cases; tc++){
         // cout << "Case #" << tc << ": ";
         Solve();

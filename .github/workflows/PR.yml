@@ -1,51 +1,38 @@
-name: Auto Comment on PR
+name: Merge on Checks Pass
 
 on:
   pull_request:
     types:
-      - opened
       - synchronize
+      - opened
       - reopened
 
 jobs:
-  auto_comment:
+  merge:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '14'
-
-      - name: Install dependencies
-        run: npm install
-
-      - name: Check if all checks have passed
-        id: checks
+      - name: Set up Git
         run: |
-          checks=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
-                      "https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/commits" \
-                      | jq -r '.[].commit.checks_url')
-          check_statuses=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
-                                $checks \
-                                | jq -r '.[].status')
-          echo "Check statuses: $check_statuses"
-          if [[ ! "$check_statuses" =~ "failure" ]]; then
-            echo "All checks passed. Commenting on the PR."
-            echo "::set-output name=approved::true"
+          git config user.name "Your GitHub Username"
+          git config user.email "your.email@example.com"
+
+      - name: Merge if checks pass
+        run: |
+          PR_NUMBER=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
+
+          # Check if all checks are successful
+          CHECKS_STATUS=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+            "https://api.github.com/repos/${{ github.repository }}/pulls/$PR_NUMBER/checks" | \
+            jq -r '.check_runs[] | select(.conclusion != "success") | .name')
+
+          if [ -z "$CHECKS_STATUS" ]; then
+            echo "All checks passed. Merging the pull request."
+            curl -s -X PUT -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+              "https://api.github.com/repos/${{ github.repository }}/pulls/$PR_NUMBER/merge"
           else
-            echo "Some checks failed. Not commenting on the PR."
-            echo "::set-output name=approved::false"
+            echo "Not all checks passed. Skipping the merge."
           fi
-
-      - name: Comment on PR
-        if: steps.checks.outputs.approved == 'true'
-        run: |
-          curl -X POST \
-            -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
-            -H "Content-Type: application/json" \
-            -d '{"body": "All checks passed. Ready for review and merge."}' \
-            "https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments"

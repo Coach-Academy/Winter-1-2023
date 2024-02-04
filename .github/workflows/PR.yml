@@ -1,10 +1,10 @@
-name: Merge on Checks Pass
+name: Auto Merge on PR Approval
 
 on:
   pull_request:
     types:
-      - synchronize
       - opened
+      - synchronize
       - reopened
 
 jobs:
@@ -12,27 +12,34 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Wait for 30 seconds
+        run: sleep 30s
+
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Set up Git
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 14
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run checks
+        run: npm run test  # Adjust this command to run your checks
+
+      - name: Merge PR if checks pass
         run: |
-          git config user.name "Your GitHub Username"
-          git config user.email "your.email@example.com"
+          # Check if all checks have passed
+          checks_status=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+            "https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/commits" | \
+            jq -r '.[].commit.status')
 
-      - name: Merge if checks pass
-        run: |
-          PR_NUMBER=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
-
-          # Check if all checks are successful
-          CHECKS_STATUS=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
-            "https://api.github.com/repos/${{ github.repository }}/pulls/$PR_NUMBER/checks" | \
-            jq -r '.check_runs[] | select(.conclusion != "success") | .name')
-
-          if [ -z "$CHECKS_STATUS" ]; then
-            echo "All checks passed. Merging the pull request."
-            curl -s -X PUT -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
-              "https://api.github.com/repos/${{ github.repository }}/pulls/$PR_NUMBER/merge"
+          if [[ "$checks_status" == "success" ]]; then
+            # Merge the pull request
+            curl -X PUT -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+              "https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/merge"
           else
-            echo "Not all checks passed. Skipping the merge."
+            echo "Checks have not passed. PR will not be merged."
           fi

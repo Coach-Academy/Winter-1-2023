@@ -1,0 +1,57 @@
+Pname: Auto Approve and Merge PR
+
+on:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+
+jobs:
+  auto_approve_merge:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '14'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Check if all checks have passed
+        id: checks
+        run: |
+          checks=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+                      "https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/commits" \
+                      | jq -r '.[].commit.checks_url')
+          check_statuses=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+                                $checks \
+                                | jq -r '.[].status')
+          echo "Check statuses: $check_statuses"
+          if [[ ! "$check_statuses" =~ "failure" ]]; then
+            echo "All checks passed. Approving and merging PR."
+            echo "::set-output name=approved::true"
+          else
+            echo "Some checks failed. Not approving PR."
+            echo "::set-output name=approved::false"
+          fi
+
+      - name: Approve and Merge PR
+        if: steps.checks.outputs.approved == 'true'
+        run: |
+          curl -X POST \
+            -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Content-Type: application/json" \
+            -d '{"event": "APPROVE"}' \
+            "https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/reviews"
+          curl -X PUT \
+            -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Content-Type: application/json" \
+            -d '{"merge_method": "merge"}' \
+            "https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/merge"
+

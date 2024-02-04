@@ -1,4 +1,4 @@
-name: Auto Approve and Merge PR
+name: Auto Comment on PR
 
 on:
   pull_request:
@@ -8,7 +8,7 @@ on:
       - reopened
 
 jobs:
-  auto_approve_merge:
+  auto_comment:
     runs-on: ubuntu-latest
 
     steps:
@@ -34,24 +34,18 @@ jobs:
                                 | jq -r '.[].status')
           echo "Check statuses: $check_statuses"
           if [[ ! "$check_statuses" =~ "failure" ]]; then
-            echo "All checks passed. Approving and merging PR."
+            echo "All checks passed. Commenting on the PR."
             echo "::set-output name=approved::true"
           else
-            echo "Some checks failed. Not approving PR."
+            echo "Some checks failed. Not commenting on the PR."
             echo "::set-output name=approved::false"
           fi
 
-      - name: Approve and Merge PR
+      - name: Comment on PR
         if: steps.checks.outputs.approved == 'true'
         run: |
           curl -X POST \
             -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
             -H "Content-Type: application/json" \
-            -d '{"event": "APPROVE"}' \
-            "https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/reviews"
-          curl -X PUT \
-            -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
-            -H "Content-Type: application/json" \
-            -d '{"merge_method": "merge"}' \
-            "https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/merge"
-
+            -d '{"body": "All checks passed. Ready for review and merge."}' \
+            "https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments"

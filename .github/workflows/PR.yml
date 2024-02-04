@@ -1,4 +1,4 @@
-Pname: Auto Approve and Merge PR
+name: Auto Approve and Merge PR
 
 on:
   pull_request:

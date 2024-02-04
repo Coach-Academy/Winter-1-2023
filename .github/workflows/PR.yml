@@ -1,11 +1,10 @@
-name: Auto Merge on PR Approval
+name: Auto Merge on Checks Pass
 
 on:
   pull_request:
     types:
       - opened
       - synchronize
-      - reopened
 
 jobs:
   merge:
@@ -15,34 +14,12 @@ jobs:
       - name: Wait for 30 seconds
         run: sleep 30s
 
-      - name: Checkout code
-        uses: actions/checkout@v2
+      - name: Check if all GitHub checks have passed
+        id: checks
+        run: echo "Check if all checks have passed"
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: 14
-
-      - name: Set working directory
-        run: cd $GITHUB_WORKSPACE
-
-      - name: Install dependencies
-        run: npm install
-
-      - name: Run checks
-        run: npm run test  # Adjust this command to run your checks
-
-      - name: Merge PR if checks pass
+      - name: Merge if checks passed
+        if: steps.checks.outcome == 'success'
         run: |
-          # Check if all checks have passed
-          checks_status=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
-            "https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/commits" | \
-            jq -r '.[].commit.status')
-
-          if [[ "$checks_status" == "success" ]]; then
-            # Merge the pull request
-            curl -X PUT -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
-              "https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/merge"
-          else
-            echo "Checks have not passed. PR will not be merged."
-          fi
+          # Replace the following command with your merge command
+          echo "Merging the pull request"

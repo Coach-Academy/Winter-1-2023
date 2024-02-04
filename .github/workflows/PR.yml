@@ -1,4 +1,4 @@
-Pname: Auto Approve and Merge PR
+name: Auto Approve and Merge PR
 
 on:
   pull_request:
@@ -54,4 +54,3 @@ jobs:
             -H "Content-Type: application/json" \
             -d '{"merge_method": "merge"}' \
             "https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/merge"
-

@@ -1,10 +1,11 @@
-name: Auto Merge on Checks Pass
+name: Merge on Checks Pass
 
 on:
   pull_request:
     types:
-      - opened
       - synchronize
+      - opened
+      - reopened
 
 jobs:
   merge:
@@ -12,22 +13,33 @@ jobs:
 
     steps:
       - name: Wait for 30 seconds
-        run: sleep 30s
+        run: sleep 30
 
-      - name: Check if all GitHub checks have passed
+      - name: Check GitHub Checks status
         id: checks
-        run: |
-          # Implement logic to check if all GitHub checks have passed
-          # You may need to use GitHub API or other tools to perform this check
-          # For demonstration purposes, we assume all checks have passed
-          echo "Checks have passed"
-          echo "::set-output name=checks_passed::true"
+        uses: actions/github-script@v4
+        with:
+          script: |
+            const response = await github.pulls.listReviews({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.payload.pull_request.number
+            });
 
-      - name: Merge if checks passed
-        if: steps.checks.outputs.checks_passed == 'true'
+            const checks = response.data.filter(review => review.state === 'APPROVED');
+
+            return {
+              checks: checks,
+              isReadyToMerge: checks.length > 0
+            };
+
+      - name: Merge PR if checks pass
+        if: ${{ steps.checks.outputs.isReadyToMerge }}
         run: |
-          # Replace the following command with your actual merge command
-          git fetch origin ${{ github.event.pull_request.head.ref }}:${{ github.event.pull_request.head.ref }}
-          git checkout ${{ github.event.pull_request.head.ref }}
-          git merge ${{ github.event.pull_request.base.ref }}
-          git push origin ${{ github.event.pull_request.head.ref }}
+          echo "All checks passed. Merging pull request..."
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git checkout -b merge-branch ${{ github.event.before }}
+          git merge --no-ff ${{ github.event.after }}
+          git push origin merge-branch
+          gh pr merge ${{ github.event.number }} --squash --auto

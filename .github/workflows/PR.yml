@@ -23,6 +23,9 @@ jobs:
         with:
           node-version: 14
 
+      - name: Set working directory
+        run: cd $GITHUB_WORKSPACE
+
       - name: Install dependencies
         run: npm install
 

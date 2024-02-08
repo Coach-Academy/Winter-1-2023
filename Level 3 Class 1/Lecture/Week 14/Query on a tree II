@@ -1,0 +1,90 @@
+#include <bits/stdc++.h>
+#define FIO ios_base::sync_with_stdio(false), cin.tie(0), cout.tie(0);
+using namespace std;
+const int N = 1e5 + 5, LOG = 18;
+
+int up[N][LOG], depth[N], dis[N];
+vector<vector<pair<int,int>>> adj;
+
+void dfs(int u, int par) { // O(n * LOG)
+    for (auto &edge: adj[u]) {
+        int v = edge.first, c = edge.second;
+        if (v == par) continue;
+        up[v][0] = u;
+        for (int i = 1; i < LOG; ++i) {
+            up[v][i] = up[up[v][i - 1]][i - 1];
+        }
+        depth[v] = depth[u] + 1;
+        dis[v] = dis[u] + c;
+        dfs(v, u);
+    }
+}
+
+int raise(int node, int k) { // O(LOG)
+    for (int i = 0; i < LOG; ++i) {
+        if ((k >> i) & 1)
+            node = up[node][i];
+    }
+    return node;
+}
+
+int LCA(int u, int v) { //(LOG)
+    if (depth[u] < depth[v])
+        swap(u, v);
+    // depth of u > depth of v
+    int k = depth[u] - depth[v];
+    u = raise(u, k);
+    // now u & v are in the same level
+    if (u == v) return u; // one of the nodes (u, v) is the LCA
+    for (int p = LOG - 1; p >= 0; --p) {
+        if (up[u][p] != up[v][p]) {
+            u = up[u][p];
+            v = up[v][p];
+        }
+    }
+    return up[u][0];
+}
+
+int main() {
+    int t;
+    cin >> t;
+    while (t--) {
+        int n;
+        cin >> n;
+        adj.resize(n + 1);
+        for (int i = 1; i <= n; ++i) {
+            adj[i].clear();
+        }
+        for (int i = 0; i < n - 1; ++i) {
+            int u, v, c;
+            cin >> u >> v >> c;
+            adj[u].push_back({v, c});
+            adj[v].push_back({u, c});
+        }
+        int root = 1;
+        dfs(root, -1); // O(n * LOG)
+        string op;
+        while (cin >> op, op != "DONE") {
+            int u, v;
+            cin >> u >> v;
+            int lca = LCA(u, v);
+            if (op == "DIST") {
+                cout << dis[u] + dis[v] - 2 * dis[lca] << "\n";
+            }
+            else { // kth in path from u to v
+                int kth;
+                cin >> kth;
+                int lenU_LCA = depth[u] - depth[lca] + 1;
+                if (kth <= lenU_LCA) {
+                    cout << raise(u, kth - 1) << "\n";
+                }
+                else {
+                    int lenV_LCA = depth[v] - depth[lca] + 1;
+                    kth = lenV_LCA - (kth - lenU_LCA);
+                    cout << raise(v, kth - 1) << "\n";
+                }
+            }
+        }
+    }
+    return 0;
+}

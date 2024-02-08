@@ -1,0 +1,70 @@
+#include <bits/stdc++.h>
+#define FIO ios_base::sync_with_stdio(false), cin.tie(0), cout.tie(0);
+using namespace std;
+const int N = 1e5 + 5, LOG = 18;
+
+int up[N][LOG], depth[N];
+vector<vector<int>> adj;
+
+void dfs(int u, int par) { // O(n * LOG)
+    for (int &v: adj[u]) {
+        if (v == par) continue;
+        up[v][0] = u;
+        for (int i = 1; i < LOG; ++i) {
+            up[v][i] = up[up[v][i - 1]][i - 1];
+        }
+        depth[v] = depth[u] + 1;
+        dfs(v, u);
+    }
+}
+
+int raise(int node, int k) { // O(LOG)
+    for (int i = 0; i < LOG; ++i) {
+        if ((k >> i) & 1)
+            node = up[node][i];
+    }
+    return node;
+}
+
+int LCA(int u, int v) { //(LOG)
+    if (depth[u] < depth[v])
+        swap(u, v);
+    // depth of u > depth of v
+    int k = depth[u] - depth[v];
+    u = raise(u, k);
+    // now u & v are in the same level
+    if (u == v) return u; // one of the nodes (u, v) is the LCA
+    for (int p = LOG - 1; p >= 0; --p) {
+        if (up[u][p] != up[v][p]) {
+            u = up[u][p];
+            v = up[v][p];
+        }
+    }
+    return up[u][0];
+}
+
+int main() {
+    int n;
+    cin >> n;
+    adj.resize(n);
+    for (int i = 0; i < n; ++i) {
+        int m;
+        cin >> m;
+        while (m--) {
+            int child;
+            cin >> child;
+            adj[i].push_back(child);
+        }
+    }
+    int root = 0;
+    dfs(root, -1);
+    // LCA(u, v)
+    int q;
+    cin >> q;
+    while (q--) {
+        int u, v;
+        cin >> u >> v;
+        cout << LCA(u, v) << "\n";
+    }
+    return 0;
+}
